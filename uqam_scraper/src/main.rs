@@ -2,29 +2,8 @@ use scraper::{ElementRef, Html, Selector};
 use serde::Serialize;
 use std::fmt::Debug;
 
-struct Class {
-    symbol: String,
-    year: u32,
-    semester: Semester,
-    program_code: u32,
-}
-
-impl Class {
-    pub fn get_url(&self) -> String {
-        format!(
-            "https://etudier.uqam.ca/wshoraire/cours/{}/{}{}/{}",
-            self.symbol, self.year, self.semester as u8, self.program_code
-        )
-    }
-}
-
-#[derive(Serialize, Debug, Clone, Copy)]
-#[allow(dead_code)]
-enum Semester {
-    Winter = 1,
-    Summer = 2,
-    Fall = 3,
-}
+mod course;
+use crate::course::{Class, Semester};
 
 #[derive(Serialize, Debug)]
 #[allow(dead_code)]
@@ -72,9 +51,6 @@ fn main() {
     let groups = parse_groups(response);
 
     println!("{}", serde_json::to_string(&groups).unwrap());
-    // for group in groups {
-    //     println!("{:?}", group);
-    // }
 }
 
 fn parse_groups(html: String) -> Vec<Group> {

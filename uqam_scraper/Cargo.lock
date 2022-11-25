@@ -970,16 +970,6 @@ checksum = "d29ab0c6d3fc0ee92fe66e2d99f700eab17a8d57d1c1d3b748380fb20baa78cd"
 
 [[package]]
 name = "scraper"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "scraper 0.13.0",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "scraper"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5684396b456f3eb69ceeb34d1b5cb1a2f6acf7ca4452131efa3ba0ee2c2d0a70"
@@ -1315,6 +1305,16 @@ name = "unicode-width"
 version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c0edd1e5b14653f783770bce4a4dabb4a5108a5370a5f5d8cfe8710c361f6c8b"
+
+[[package]]
+name = "uqam_scraper"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "scraper",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "url"
