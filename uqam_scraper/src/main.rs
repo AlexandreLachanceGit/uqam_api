@@ -1,3 +1,4 @@
+use phf::{phf_map, Map};
 use scraper::{ElementRef, Html, Selector};
 use serde::Serialize;
 use std::fmt::Debug;
@@ -37,6 +38,21 @@ struct Location {
     classroom: Option<String>,
     campus: String,
 }
+
+static MONTHS_MAP: Map<&'static str, u8> = phf_map! {
+    "janvier" => 1,
+    "février" => 2,
+    "mars" => 3,
+    "avril" => 4,
+    "mai" => 5,
+    "juin" => 6,
+    "juillet" => 7,
+    "août" => 8,
+    "septembre" => 9,
+    "octobre" => 10,
+    "novembre" => 11,
+    "décembre" => 12,
+};
 
 fn main() {
     let class = Class {
@@ -159,8 +175,10 @@ fn parse_period(doc: &ElementRef) -> Period {
         .map(|x| x.trim().to_string())
         .collect::<Vec<String>>();
 
+    let trimmed_day = text_parts[0].trim().to_string();
+
     Period {
-        day: text_parts[0].to_string(),
+        day: trimmed_day,
         start_date,
         end_date,
         start_time: times[1].to_string(),
@@ -174,9 +192,21 @@ fn parse_dates(text: &str) -> (String, String) {
     let parts = text
         .split("<br>")
         .map(|x| x.trim().replace("Du ", "").replace("au ", ""))
+        .map(|x| format_date(&x))
         .collect::<Vec<String>>();
 
     (parts[0].to_string(), parts[1].to_string())
+}
+
+fn format_date(text: &str) -> String {
+    let parts: Vec<&str> = text.split(' ').collect();
+
+    format!(
+        "{}-{:0>2}-{:0>2}",
+        parts[2],
+        MONTHS_MAP.get(parts[1]).unwrap(),
+        parts[0]
+    )
 }
 
 fn parse_location(text: &str) -> Option<Location> {
@@ -185,19 +215,15 @@ fn parse_location(text: &str) -> Option<Location> {
         .map(|x| x.trim().to_string())
         .collect::<Vec<String>>();
 
-    if text.is_empty() {
-        None
-    } else if parts.len() == 1 {
-        Some(Location {
-            classroom: None,
-            campus: parts[0].to_string(),
-        })
-    } else if parts.len() == 2 {
-        Some(Location {
-            classroom: Some(parts[0].to_string()),
+    match text.is_empty() {
+        false => Some(Location {
+            classroom: if !parts[0].is_empty() {
+                Some(parts[0].to_string())
+            } else {
+                None
+            },
             campus: parts[1].to_string(),
-        })
-    } else {
-        None
+        }),
+        true => None,
     }
 }
